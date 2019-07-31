@@ -1,64 +1,62 @@
 ﻿using System;
+using Utils.Input;
+using Utils.Output;
+using static System.String;
 
 namespace ConsoleApp1
 {
-    class Program
+    public class Program
     {
-
-        static void Main(string[] args)
+        static void Main()
         {
-            bool work = true;
-            ValueArray array = new ValueArray();
+            bool isWorking = true;
+            IOutputter outputter = new ConsoleOutputter();
+            IInputter inputter = new ConsoleInputter();
+            ValueArray array = new ValueArray(outputter);
 
-            while (work)
+            while (isWorking)
             {
                 try
                 {
-                    Console.WriteLine(PreparedStrings.InputValue);
+                    outputter.WriteLine(PreparedStrings.InputValue);
                     foreach (var value in Enum.GetValues(typeof(InputType)))
                     {
-                        Console.WriteLine(PreparedStrings.EnumToString, (int)value, value);
+                        string str = Format(PreparedStrings.EnumToString, (int)value, value);
+                        outputter.WriteLine(str);
                     }
 
-                    var line = Console.ReadLine();
+                    string line = inputter.Read();
                     if (!Enum.TryParse(line, out InputType parsed))
                     {
-                        Console.WriteLine(PreparedStrings.WrongInput);
+                        outputter.WriteLine(PreparedStrings.WrongInput);
                         continue;
                     }
 
                     switch (parsed)
                     {
                         case InputType.WriteString:
-                            array.AddValue(Console.ReadLine());
+                            array.AddValue(inputter.Read());
                             break;
                         case InputType.ShowResult:
                             array.ShowResult();
                             break;
                         case InputType.Exit:
-                            work = false;
+                            isWorking = false;
                             break;
                         default:
-                            Console.WriteLine(PreparedStrings.WrongEnum);
+                            outputter.WriteLine(PreparedStrings.WrongEnum);
                             break;
                     }
-
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    outputter.WriteLine(ex.Message);
                 }
                 finally
                 {
-                    Console.WriteLine(PreparedStrings.EndOfBlock);
+                    outputter.WriteLine(PreparedStrings.EndOfBlock);
                 }
             }
         }
     }
-
-
-
-
-
-
 }

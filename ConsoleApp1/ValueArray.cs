@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Utils.Output;
+using static System.String;
 
 namespace ConsoleApp1
 {
@@ -8,24 +9,31 @@ namespace ConsoleApp1
     {
         public List<double> Values { get; } = new List<double>();
 
+        private readonly IOutputter _outputter;
+
+        public ValueArray(IOutputter outputter)
+        {
+            _outputter = outputter;
+        }
+
         public void AddValue(string line)
         {
-            if (!double.TryParse(line, out double result))
-            {
-                return;
-            }
+            Values.Add(Parse(line));
+        }
 
-            Values.Add(result);
+        private double Parse(string str)
+        {
+            return double.Parse(str);
         }
 
         public void ShowResult()
         {
-            Console.WriteLine(PreparedStrings.ResultBegin);
-            Values.ForEach(v => Console.Write($"{v} "));
-            Console.WriteLine();
+            _outputter.WriteLine(PreparedStrings.ResultBegin);
+            Values.ForEach(v => _outputter.Write($"{v} "));
+            _outputter.WriteLine(Empty);
 
-            Console.WriteLine(PreparedStrings.MinValueOutput, Values.Min(), Values.IndexOf(Values.Min()));
-            Console.WriteLine(PreparedStrings.MinValueOutput, Values.Max(), Values.IndexOf(Values.Max()));
+            _outputter.WriteLine(Format(PreparedStrings.MinValueOutput, Values.Min(), Values.IndexOf(Values.Min())));
+            _outputter.WriteLine(Format(PreparedStrings.MaxValueOutput, Values.Max(), Values.IndexOf(Values.Max())));
         }
     }
 }
